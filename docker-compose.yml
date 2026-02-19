@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  go-3rd-service:
+    build:
+      context: ./go-3rd-service
+    ports:
+      - "9090:9090"
+    environment:
+      - GOMAXPROCS=1
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
