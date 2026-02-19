@@ -8,8 +8,47 @@ services:
       - "9090:9090"
     environment:
       - GOMAXPROCS=1
+    networks:
+      - benchmark-net
     deploy:
       resources:
         limits:
           cpus: '1.0'
           memory: 2G
+
+  postgres-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: benchmark_user
+      POSTGRES_PASSWORD: benchmark_pass
+      POSTGRES_DB: benchmark_db
+    ports:
+      - "5432:5432"
+    networks:
+      - benchmark-net
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    command: ["postgres", "-c", "max_connections=500"]
+
+service-j17:
+    build:
+      context: ./java-17-service
+    ports:
+      - "8017:8017"
+    networks:
+      - benchmark-net
+    depends_on:
+      - postgres-db
+      - go-3rd-service
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+
+networks:
+  benchmark-net:
+    driver: bridge
